@@ -24,3 +24,4 @@ cargo build --release --target x86_64-unknown-linux-musl
 
 Caso seja necessário fazer alguma alteração no projeto, é necessário buildar o projeto e atualizar o binário 'ri-casper-js' distribuído no zip CasperJS.7z. O zip se encontra 'F:\SIGER\\<versao_siger>\lib\CasperJs.7z'.
 
+Dúvidas podem ser vistas com o time SIGER-Tools.
