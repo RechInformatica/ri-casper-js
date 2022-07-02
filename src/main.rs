@@ -3,9 +3,10 @@ use serde_json::*;
 use std::process::exit;
 use std::{env, fs::read_link, path::Path};
 
-/// Script para executar o CasperJS
+/// CasperJS Wrapper Cross-platform
 fn main() {
-    // Engines suportadas pelo CasperJS
+
+    // Supported engines by CasperJS
     let supported_engines = json!({
         "phantomjs" : {
             "native_args": [
@@ -97,30 +98,30 @@ fn main() {
         },
     });
 
-    // Busca a partir de variáveis de ambiente informações para a execução
+    // Get the execution info from environment variables
     let mut engine = env::var("CASPERJS_ENGINE").unwrap_or_else(|_| "phantomjs".to_string());
     let engine_flags = env::var("ENGINE_FLAGS").unwrap_or_default();
     let mut engine_args = shlex::split(engine_flags.as_str()).unwrap_or_default();
 
-    // Busca a localização do executável atual
+    // Get the localization of the current executable
     let current_exe = env::current_exe().unwrap_or_default();
     let path = current_exe.to_str().unwrap_or_default();
 
-    // Resolve a localização do CasperJS a partir do executável
+    // Solve CasperJS location
     let resolved = resolve(path.to_string());
     let dirname = Path::new(resolved.as_str())
         .parent()
         .unwrap()
         .join("..");
 
-    // Busca o caminho absoluto do CasperJS
+    // Get absolute path of CasperJS engine
     let absolutize = Absolutize::absolutize(&dirname).unwrap_or_default();
     let casper_path = absolutize.to_str().unwrap_or_default();
 
-    // Busca os argumentos passados para o executável
+    // Get the executable args
     let sys_args: &Vec<String> = &env::args().collect();
 
-    // Verifica se foi informado uma engine específica via linha de comando
+    // Checks if a specific engine was informed from the command line
     for arg in sys_args {
         if let Some(e) = arg.strip_prefix("--engine=") {
             engine = e.to_string();
@@ -128,25 +129,25 @@ fn main() {
         };
     }
 
-    // Se não for uma das engines suportadas, encerra a execução
+    // If the engine is not supported, finish the current execution
     if supported_engines.get(&engine) == None {
         exit(1);
     }
 
-    // Busca os argumentos nativos da engine que será executada
+    // Get the native args of the engine
     let engine_native_args = supported_engines
         .get(&engine)
         .unwrap()
         .get("native_args")
         .unwrap();
 
-    // Busca os argumentos nativos da engine que será executada
+    // Get the native args of the engine
     let engine_native_args_with_space = supported_engines
         .get(&engine)
         .unwrap()
         .get("native_args_with_space");
 
-    // Busca a localização do executável da engine
+    // Get the location of engine executable
     let env_varname = supported_engines
         .get(&engine)
         .unwrap()
@@ -156,8 +157,8 @@ fn main() {
         .unwrap();
     let mut engine_executable = env::var(&env_varname).unwrap_or_default();
 
-    // Se não conseguiu buscar o executável engine, verifica se está informado através de variável de ambiente
-    // Se também não estiver informando, assume a informação default que está no JSON das engines suportadas
+    // If can't get the engine executable, verify if it was informed on environment variable
+    // If cant't get from environment variables too, assumes a default information that is in the JSON of the supported engines
     if engine_executable.is_empty() {
         engine_executable = match env::var("ENGINE_EXECUTABLE") {
             Ok(var) => var,
@@ -176,7 +177,7 @@ fn main() {
 
     let mut iter = sys_args.iter();
 
-    // Varre os argumentos da engine
+    // Iterate the engine args
     while let Some(arg) = iter.next() {
         let arg_name = extract_arg_name(arg.clone());
         let mut found = false;
@@ -199,7 +200,7 @@ fn main() {
         }
     }
 
-    // Monta a lista com os argumentos que serão repassados para a execução da engine
+    // Build the args list to the engine executable
     let mut casper_command = vec![engine_executable];
     casper_command.extend(engine_args);
     let path = Path::new(&casper_path)
@@ -217,14 +218,13 @@ fn main() {
     casper_args.remove(0);
     casper_command.extend(casper_args);
 
-    // Substitui o processo atual pela execução da engine
+    // Replace the current proccess by the engine execution
     let _err = exec::execvp(casper_command.get(0).unwrap(), &casper_command);
 
-    // Sai do programa com exit code 1, pois só vai chegar aqui em caso de falha do comando acima
+    // Exit program with status code 1, because just will be here if the command fail
     exit(1);
 }
 
-/// Método para resolver a localização de um link simbólico
 fn resolve(path: String) -> String {
     let link_path = Path::new(path.as_str());
     return match read_link(link_path) {
@@ -239,7 +239,6 @@ fn resolve(path: String) -> String {
     };
 }
 
-/// Extrai o nome do argumento
 fn extract_arg_name(arg: String) -> String {
     let result: Vec<&str> = arg.split('=').collect();
     result[0].replace("--", "")

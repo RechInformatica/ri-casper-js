@@ -1,27 +1,21 @@
-<h1><center>ri-casper-js - Wrapper para executar o Casper JS</h1>
+<h1><center>ri-casper-js - Casper JS Wrapper</h1>
 
-O CasperJS é um aplicativo open source para execução de Web Scraping.
+CasperJS is an open source application to execute Web Scraping.
 
-Esse projeto foi criado com o objetivo de permitir disparar a execução do CasperJS em ambientes de clientes com servidor Linux. Dessa forma, esse projeto serve somente para fazer a ponte para executar o CasperJS.
+This project was made to execute CasperJS in Linux OS. So, this project is just a 'wrapper class' to execute CasperJS engine.
 
-O projeto do CasperJS possui um disparador para sistemas operacionais Linux, porém é um script Python.
-Como não queremos depender de ter o Python instalado nos clientes, reescrevemos o wrapper disponibilizado pela comunidade na linguagem Rust. Dessa forma, podemos compilar o projeto gerando um binário para execução em Linux sem necessitar de nenhuma outra dependência.
+The open source CasperJS project have a script to execute CasperJS, but this was written in Python.
+We wouldn't like to depends of a Python runtime, so we rewritted the community script in Rust. This way, we can build the project getting a binary executable, without a dependency of a specific runtime.
 
-Atualmente a nossa aplicação só funciona para ambiente com sistema operacional Linux, pois a única biblioteca que encontramos para executar o comando execvp está preparada somente para funcionar em Linux.
+Actually, our application just works for Linux OS, because we use a library that just works for Linux OS too.
 
-No script Python disponibilizado pela comunidade, é utilizado um método 'execvp' da biblioteca 'os' do Python.
-Esse método serve para substituir o processo atual por um novo processo. Nesse caso, simplesmente criar um novo processo filho do atual não iria resolver o nosso problema. Devido a isso, estamos utilizando a biblioteca 'exec' que permite mantermos o mesmo comportamento do script Python.
+In the Python script, the method 'execvp' is used from 'os' lib.
+This method serve to replace the current proccess by a new proccess. This way, just run a new child proccess will not solve our problem. So, we are using a lib called 'exec' to get this feature, like on Python and C languages.
 
-<h2>Como buildar o projeto?</h2>
+<h2>How can you build the project?</h2>
 
-Caso seja necessáro buildar o projeto, pode ser feito através do seguinte comando:
+If you want to build the project, you can run this command:
 
 ```
 cargo build --release --target x86_64-unknown-linux-musl
 ```
-
-<h2>Alterações</h2>
-
-Caso seja necessário fazer alguma alteração no projeto, é necessário buildar o projeto e atualizar o binário 'ri-casper-js' distribuído no zip CasperJS.7z. O zip se encontra 'F:\SIGER\\<versao_siger>\lib\CasperJs.7z'.
-
-Dúvidas podem ser vistas com o time SIGER-Tools.
